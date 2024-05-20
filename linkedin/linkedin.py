@@ -40,7 +40,7 @@ jobs = driver.find_elements(By.XPATH, '//*[@id="main-content"]/section[2]/ul/li'
 
 current_date = datetime.now()
 date_str = current_date.strftime("%m-%d-%y")
-filename = f'linkedin-{date_str}.csv'
+filename = f'{date_str}-linkedin-{keywords}-{job_location}.csv'
 
 with open(filename, 'w', newline = '', encoding ='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile)
