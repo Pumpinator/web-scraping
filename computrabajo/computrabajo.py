@@ -15,6 +15,7 @@ prefs = {"profile.default_content_setting_values.notifications" : 2}
 chrome_options.add_experimental_option("prefs",prefs)
 chrome_options.add_argument("--disable-popups")
 
+# Aqui se debe de poner la ruta donde se encuentra su chromedriver, puede ser un contenedor en un puerto local o el ejecutable del driver
 service = Service('/opt/homebrew/Caskroom/chromedriver/125.0.6422.60/chromedriver-mac-arm64/chromedriver')
 driver = webdriver.Chrome(service=service, options=chrome_options)
 url = 'https://mx.computrabajo.com'

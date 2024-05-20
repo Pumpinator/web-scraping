@@ -10,6 +10,7 @@ import time
 keywords = 'Programador Java'
 job_location = 'León, Guanajuato'
 
+# Aqui se debe de poner la ruta donde se encuentra su chromedriver, puede ser un contenedor en un puerto local o el ejecutable del driver
 service = Service('/opt/homebrew/Caskroom/chromedriver/125.0.6422.60/chromedriver-mac-arm64/chromedriver')
 driver = webdriver.Chrome(service = service)
 
