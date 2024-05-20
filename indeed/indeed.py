@@ -28,7 +28,7 @@ jobs = driver.find_elements(By.XPATH, '/html/body/main/div/div[2]/div/div[5]/div
 
 current_date = datetime.now()
 date_str = current_date.strftime("%m-%d-%y")
-filename = f'indeed-{date_str}.csv'
+filename = f'{date_str}-indeed-{keywords}-{job_location}.csv'
 
 with open(filename, 'w', newline = '', encoding ='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile)

@@ -17,7 +17,7 @@ def process(text):
     else:
         return ""
 
-keyword = 'Programador Java'
+keywords = 'Programador Java'
 job_location = 'León, Guanajuato'
 
 chrome_options = Options()
@@ -31,13 +31,13 @@ driver = webdriver.Chrome(service=service, options=chrome_options)
 url = 'https://mx.computrabajo.com'
 driver.get(url)
 
-driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/div/div[1]/form/input[2]').send_keys(keyword)
+driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/div/div[1]/form/input[2]').send_keys(keywords)
 driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/div/div[2]/form/input[2]').send_keys(job_location)
 driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/button').click()
 
 current_date = datetime.now()
 date_str = current_date.strftime("%m-%d-%y")
-filename = f'{keyword}-{job_location}-computrabajo-{date_str}.csv'
+filename = f'{date_str}-computrabajo-{keywords}-{job_location}.csv'
 
 with open(filename, 'w', newline = '', encoding ='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile)
