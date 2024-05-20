@@ -5,7 +5,17 @@ from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 
+import re
 import csv
+
+def process(text):
+    pattern = r"^\d+,\d+\s*(.*)"
+    coincidencia = re.search(pattern, text)
+    if coincidencia:
+        texto_procesado = coincidencia.group(1).strip()  # Elimina espacios en blanco al principio y al final
+        return texto_procesado
+    else:
+        return ""
 
 keyword = 'Programador Java'
 location = 'León, Guanajuato'
@@ -27,15 +37,14 @@ driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/button'
 
 current_date = datetime.now()
 date_str = current_date.strftime("%m-%d-%y")
-filename = f'computrabajo-{date_str}.csv'
+filename = f'{keyword}-{location}-computrabajo-{date_str}.csv'
 
 with open(filename, 'w', newline = '', encoding ='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile)
-    csv_writer.writerow(['title', 'location', 'publish_date', 'link'])
+    csv_writer.writerow(['title', 'company', 'location', 'publish_date', 'link'])
     
     while True:
         jobs = driver.find_elements(By.XPATH, '/html/body/main/div[8]/div/div[2]/div[1]/article')
-        print(len(jobs))
 
         for job in jobs:
             try:
@@ -49,6 +58,13 @@ with open(filename, 'w', newline = '', encoding ='utf-8') as csvfile:
                 location = None
                 
             try:
+                tags = job.find_element(By.XPATH, './/p[1]')
+            except NoSuchElementException:
+                tags = None
+            
+            company = process(tags.text)
+            
+            try:
                 publish_date = job.find_element(By.XPATH, './/p[3]').text
             except NoSuchElementException:
                 publish_date = None
@@ -58,9 +74,9 @@ with open(filename, 'w', newline = '', encoding ='utf-8') as csvfile:
             except NoSuchElementException:
                 link = None
             
-            print(title, location, publish_date, link)
+            print(title, company, location, publish_date, link)
                 
-            csv_writer.writerow([title, location, publish_date, link])
+            csv_writer.writerow([title, company, location, publish_date, link])
 
         try:
             next_page = driver.find_element(By.XPATH, '//span[@title="Siguiente"]')
