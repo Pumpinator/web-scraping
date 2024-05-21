@@ -3,6 +3,7 @@ import sys
 import os
 import requests
 import re
+import time
 import csv
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -13,6 +14,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from ms_graph import generate_access_token, GRAPH_API_ENDPOINT
 
 parser = argparse.ArgumentParser(description="Computrabajo job scraper")
@@ -26,7 +29,6 @@ job_location = args.location
 chrome_options = Options()
 prefs = {"profile.default_content_setting_values.notifications" : 2}
 chrome_options.add_experimental_option("prefs",prefs)
-chrome_options.add_argument("--disable-popups")
 
 # Aqui se debe de poner la ruta donde se encuentra su chromedriver, puede ser un contenedor en un puerto local o el ejecutable del driver
 service = Service('/opt/homebrew/Caskroom/chromedriver/125.0.6422.60/chromedriver-mac-arm64/chromedriver')
@@ -37,7 +39,15 @@ driver.get(url)
 
 driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/div/div[1]/form/input[2]').send_keys(keywords)
 driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/div/div[2]/form/input[2]').send_keys(job_location)
-driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/button').click()
+driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/div/div[2]/form/input[2]').click()
+try:
+    WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/div/div[2]/form/ul[1]/li/div/div')))
+    job_location = driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/div/div[2]/form/ul[1]/li/div/div').text
+    driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/div/div[2]/form/ul[1]/li/div/div').click()
+except NoSuchElementException:
+    pass
+
+driver.find_element(By.XPATH, '//*[@id="search-button"]').click()
 
 current_date = datetime.now()
 date_str = current_date.strftime("%m-%d-%y")
