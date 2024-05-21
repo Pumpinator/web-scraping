@@ -1,24 +1,27 @@
+import argparse
+import sys
+import os
+import requests
+import re
+import csv
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from selenium import webdriver
 from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
+from ms_graph import generate_access_token, GRAPH_API_ENDPOINT
 
-import re
-import csv
+parser = argparse.ArgumentParser(description="Computrabajo job scraper")
+parser.add_argument('--keywords', type=str, default='Programador Java', required=False, help='Job keywords')
+parser.add_argument('--location', type=str, default='León, Guanajuato', required=False, help='Job location')
+args = parser.parse_args()
 
-def process(text):
-    pattern = r"^\d+,\d+\s*(.*)"
-    coincidencia = re.search(pattern, text)
-    if coincidencia:
-        texto_procesado = coincidencia.group(1).strip()  # Elimina espacios en blanco al principio y al final
-        return texto_procesado
-    else:
-        return ""
-
-keywords = 'Programador Java'
-job_location = 'León, Guanajuato'
+keywords = args.keywords
+job_location = args.location
 
 chrome_options = Options()
 prefs = {"profile.default_content_setting_values.notifications" : 2}
@@ -28,6 +31,7 @@ chrome_options.add_argument("--disable-popups")
 # Aqui se debe de poner la ruta donde se encuentra su chromedriver, puede ser un contenedor en un puerto local o el ejecutable del driver
 service = Service('/opt/homebrew/Caskroom/chromedriver/125.0.6422.60/chromedriver-mac-arm64/chromedriver')
 driver = webdriver.Chrome(service=service, options=chrome_options)
+
 url = 'https://mx.computrabajo.com'
 driver.get(url)
 
@@ -37,9 +41,10 @@ driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/button'
 
 current_date = datetime.now()
 date_str = current_date.strftime("%m-%d-%y")
-filename = f'{date_str}-computrabajo-{keywords}-{job_location}.csv'
+file_name = f'{date_str}-Computrabajo-{keywords}-{job_location}.csv'
+file_path = f'./{file_name}'
 
-with open(filename, 'w', newline = '', encoding ='utf-8') as csvfile:
+with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile)
     csv_writer.writerow(['title', 'company', 'job_location', 'publish_date', 'link'])
     
@@ -61,9 +66,13 @@ with open(filename, 'w', newline = '', encoding ='utf-8') as csvfile:
                 tags = job.find_element(By.XPATH, './/p[1]')
             except NoSuchElementException:
                 tags = None
-            
-            company = process(tags.text)
-            
+                
+            match = re.search(r"^\d+,\d+\s*(.*)", tags.text)
+            if match:
+                company = match.group(1).strip()  # Elimina espacios en blanco al principio y al final
+            else:
+                company = ""
+                            
             try:
                 publish_date = job.find_element(By.XPATH, './/p[3]').text
             except NoSuchElementException:
@@ -85,3 +94,19 @@ with open(filename, 'w', newline = '', encoding ='utf-8') as csvfile:
             break
         
 driver.quit()
+
+access_token = generate_access_token(service)
+headers = {
+    'Authorization': 'Bearer ' + access_token['access_token']
+}
+
+with open(file_path, 'rb') as upload:
+    media_file = upload.read()
+
+response = requests.put(
+    f'{GRAPH_API_ENDPOINT}/me/drive/items/root:/Scraping/{file_name}:/content',
+    headers=headers,
+    data=media_file,
+)
+
+print(response.json())

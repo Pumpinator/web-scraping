@@ -1,3 +1,7 @@
 *.csv
-*.csv
+ms_graph_api_token.json
+
+.env
+.env.**
 .DS_Store
+__pycache__

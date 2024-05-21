@@ -1,14 +1,27 @@
-from selenium import webdriver
-from datetime import datetime
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.common.exceptions import NoSuchElementException
-
+import argparse
+import sys
+import os
+import requests
 import csv
 import time
 
-keywords = 'Programador Java'
-job_location = 'León, Guanajuato'
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.service import Service
+from selenium.common.exceptions import NoSuchElementException
+from ms_graph import generate_access_token, GRAPH_API_ENDPOINT
+
+parser = argparse.ArgumentParser(description="LinkedIn job scraper")
+parser.add_argument('--keywords', type=str, default='Programador Java', required=False, help='Job keywords')
+parser.add_argument('--location', type=str, default='León, Guanajuato', required=False, help='Job location')
+args = parser.parse_args()
+
+keywords = args.keywords
+job_location = args.location
+
 
 # Aqui se debe de poner la ruta donde se encuentra su chromedriver, puede ser un contenedor en un puerto local o el ejecutable del driver
 service = Service('/opt/homebrew/Caskroom/chromedriver/125.0.6422.60/chromedriver-mac-arm64/chromedriver')
@@ -40,9 +53,10 @@ jobs = driver.find_elements(By.XPATH, '//*[@id="main-content"]/section[2]/ul/li'
 
 current_date = datetime.now()
 date_str = current_date.strftime("%m-%d-%y")
-filename = f'{date_str}-linkedin-{keywords}-{job_location}.csv'
+file_name = f'{date_str}-LinkedIn-{keywords}-{job_location}.csv'
+file_path = f'./{file_name}'
 
-with open(filename, 'w', newline = '', encoding ='utf-8') as csvfile:
+with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile)
     csv_writer.writerow(['title', 'company', 'location', 'text', 'publish_date', 'link'])
 
@@ -76,3 +90,19 @@ with open(filename, 'w', newline = '', encoding ='utf-8') as csvfile:
         csv_writer.writerow([title, company, location, text, publish_date, link])
 
 driver.quit()
+
+access_token = generate_access_token(service)
+headers = {
+    'Authorization': 'Bearer ' + access_token['access_token']
+}
+
+with open(file_path, 'rb') as upload:
+    media_file = upload.read()
+
+response = requests.put(
+    f'{GRAPH_API_ENDPOINT}/me/drive/items/root:/Scraping/{file_name}:/content',
+    headers=headers,
+    data=media_file,
+)
+
+print(response.json())
