@@ -1,4 +1,5 @@
 import argparse
+import re
 import sys
 import os
 import requests
@@ -22,10 +23,8 @@ args = parser.parse_args()
 keywords = args.keywords
 job_location = args.location
 
-
-# Aqui se debe de poner la ruta donde se encuentra su chromedriver, puede ser un contenedor en un puerto local o el ejecutable del driver
-service = Service('/opt/homebrew/Caskroom/chromedriver/125.0.6422.60/chromedriver-mac-arm64/chromedriver')
-driver = webdriver.Chrome(service = service)
+options = webdriver.ChromeOptions()
+driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub', options=options)
 
 url = 'https://www.linkedin.com/jobs/search?trk=guest_homepage-basic_guest_nav_menu_jobs'
 driver.get(url)
@@ -52,8 +51,8 @@ while True:
 jobs = driver.find_elements(By.XPATH, '//*[@id="main-content"]/section[2]/ul/li')
 
 current_date = datetime.now()
-date_str = current_date.strftime("%m-%d-%y")
-file_name = f'{date_str}-LinkedIn-{keywords}-{job_location}.csv'
+date_str = current_date.strftime("%y-%m-%d")
+file_name = f'{date_str}-{keywords}-{job_location}-LinkedIn.csv'
 file_path = f'./{file_name}'
 
 with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
@@ -89,9 +88,7 @@ with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
         
         csv_writer.writerow([title, company, location, text, publish_date, link])
 
-driver.quit()
-
-access_token = generate_access_token(service)
+access_token = generate_access_token(driver)
 headers = {
     'Authorization': 'Bearer ' + access_token['access_token']
 }
@@ -100,7 +97,7 @@ with open(file_path, 'rb') as upload:
     media_file = upload.read()
 
 response = requests.put(
-    f'{GRAPH_API_ENDPOINT}/me/drive/items/root:/Scraping/{file_name}:/content',
+    f'{GRAPH_API_ENDPOINT}/me/drive/items/root:/Scraping/LinkedIn/{file_name}:/content',
     headers=headers,
     data=media_file,
 )

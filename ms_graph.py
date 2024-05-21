@@ -18,7 +18,7 @@ EMAIL = os.getenv('EMAIL')
 PASSWORD = os.getenv('PASSWORD')
 
 # Fuente: https://learndataanalysis.org/ms_graph-py-source-code/
-def generate_access_token(chromeservice):
+def generate_access_token(driver):
     # Save Session Token as a token file
     access_token_cache = msal.SerializableTokenCache()
 
@@ -45,8 +45,6 @@ def generate_access_token(chromeservice):
         user_code = flow['user_code']
         print(user_code)
 
-        # use Selenium para automatizar el proceso de inicio de sesion y autenticacion.
-        driver = webdriver.Chrome(service = chromeservice)
         driver.get('https://microsoft.com/devicelogin')
 
         driver.find_element(By.XPATH, '/html/body/div/form/div/div/div[1]/div[3]/div/div/div/div[4]/div/input').send_keys(user_code)

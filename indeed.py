@@ -1,4 +1,5 @@
 import argparse
+import re
 import sys
 import os
 import requests
@@ -24,9 +25,8 @@ args = parser.parse_args()
 keywords = args.keywords
 job_location = args.location
 
-# Aqui se debe de poner la ruta donde se encuentra su chromedriver, puede ser un contenedor en un puerto local o el ejecutable del driver
-service = Service('/opt/homebrew/Caskroom/chromedriver/125.0.6422.60/chromedriver-mac-arm64/chromedriver')
-driver = webdriver.Chrome(service = service)
+options = webdriver.ChromeOptions()
+driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub', options=options)
 
 url = 'https://mx.indeed.com'
 driver.get(url)
@@ -47,16 +47,16 @@ driver.find_element(By.XPATH, '/html/body/div/div[1]/div/span/div[4]/div[2]/div/
 jobs = driver.find_elements(By.XPATH, '/html/body/main/div/div[2]/div/div[5]/div/div[1]/div[5]/div/ul/li')
 
 current_date = datetime.now()
-date_str = current_date.strftime("%m-%d-%y")
-file_name = f'{date_str}-Indeed-{keywords}-{job_location}.csv'
+date_str = current_date.strftime("%y-%m-%d")
+file_name = f'{date_str}-{keywords}-{job_location}-Indeed.csv'
 file_path = f'./{file_name}'
 
 with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile)
-    csv_writer.writerow(['title', 'company', 'location', 'text', 'publish_date', 'link'])
+    csv_writer.writerow(['title', 'company', 'location', 'text', 'salary', 'publish_date', 'link'])
     
     for job in jobs:
-        title = job.find_element(By.XPATH, './/div/div/div/div/div/table/tbody/tr/td[1]/div[1]/h2/a/span').text
+        title = job.find_element(By.XPATH, './/div/div/div/div/div/table/tbody/tr/td[1]/div[1]/h2/a').text
         company = job.find_element(By.XPATH, './/div/div/div/div/div/table/tbody/tr/td[1]/div[2]/div/span').text
         location = job.find_element(By.XPATH, './/div/div/div/div/div/table/tbody/tr/td[1]/div[2]/div/div').text
         
@@ -77,13 +77,37 @@ with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
         
         link = job.find_element(By.XPATH, './/div/div/div/div/div/table/tbody/tr/td[1]/div[1]/h2/a').get_attribute('href')
         
-        print(title, company, location, text, publish_date, link)
-        
-        csv_writer.writerow([title, company, location, text, publish_date, link])
-    
-driver.quit()
+        try:
+            salary_element = job.find_element(By.XPATH, './/div/div/div/div/div/table/tbody/tr/td[1]/div[3]/div[1]/div[1]/div')
+            salary_original = salary_element.text.strip()
+            # Comprobar si el salario tiene el símbolo "$"
+            if '$' in salary_original:
+                # Comprobar si el salariocontiene 'a' en lugar de un guion '-'
+                if ' a ' in salary_original:
+                    # Caso 2: Salario en forma de rango, ej. "$##,### a $##,###"
+                    # Extraer los números del texto del salario
+                    salary_numbers = re.findall(r'\d{1,3}(?:,\d{3})*', salary_original)
+                    salary_min = int(salary_numbers[0].replace(',', ''))
+                    salary_max = int(salary_numbers[1].replace(',', ''))
 
-access_token = generate_access_token(service)
+                    # Calcular el salario promedio
+                    salary = (salary_min + salary_max) / 2
+                else:
+                    # Caso 3: Salario sin rango, ej. "$##,###"
+                    # Eliminar el símbolo "$" y cualquier carácter que no sea dígito
+                    salary = int(re.sub(r'[^\d]', '', salary_original))
+            else:
+                # Caso 1: Salario no especificado o no numérico
+                # Asignar un valor predeterminado de 0 al salario
+                salary = 0
+        except NoSuchElementException:
+            salary = None
+
+        print(title, company, location, text, salary, publish_date, link)
+        
+        csv_writer.writerow([title, company, location, text, salary, publish_date, link])
+    
+access_token = generate_access_token(driver)
 headers = {
     'Authorization': 'Bearer ' + access_token['access_token']
 }

@@ -13,6 +13,7 @@ from datetime import datetime
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -26,13 +27,10 @@ args = parser.parse_args()
 keywords = args.keywords
 job_location = args.location
 
-chrome_options = Options()
+chrome_options = webdriver.ChromeOptions()
 prefs = {"profile.default_content_setting_values.notifications" : 2}
 chrome_options.add_experimental_option("prefs",prefs)
-
-# Aqui se debe de poner la ruta donde se encuentra su chromedriver, puede ser un contenedor en un puerto local o el ejecutable del driver
-service = Service('/opt/homebrew/Caskroom/chromedriver/125.0.6422.60/chromedriver-mac-arm64/chromedriver')
-driver = webdriver.Chrome(service=service, options=chrome_options)
+driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub', options=chrome_options)
 
 url = 'https://mx.computrabajo.com'
 driver.get(url)
@@ -44,19 +42,19 @@ try:
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/div/div[2]/form/ul[1]/li/div/div')))
     job_location = driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/div/div[2]/form/ul[1]/li/div/div').text
     driver.find_element(By.XPATH, '/html/body/main/div[2]/div/div/div/div[1]/div/div[2]/form/ul[1]/li/div/div').click()
-except NoSuchElementException:
+except TimeoutException:
     pass
 
 driver.find_element(By.XPATH, '//*[@id="search-button"]').click()
 
 current_date = datetime.now()
-date_str = current_date.strftime("%m-%d-%y")
-file_name = f'{date_str}-Computrabajo-{keywords}-{job_location}.csv'
+date_str = current_date.strftime("%y-%m-%d")
+file_name = f'{date_str}-{keywords}-{job_location}-Computrabajo.csv'
 file_path = f'./{file_name}'
 
 with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile)
-    csv_writer.writerow(['title', 'company', 'job_location', 'publish_date', 'link'])
+    csv_writer.writerow(['profile', 'title', 'company', 'job_location', 'publish_date', 'link'])
     
     while True:
         jobs = driver.find_elements(By.XPATH, '/html/body/main/div[8]/div/div[2]/div[1]/article')
@@ -103,9 +101,7 @@ with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
         except NoSuchElementException:
             break
         
-driver.quit()
-
-access_token = generate_access_token(service)
+access_token = generate_access_token(driver)
 headers = {
     'Authorization': 'Bearer ' + access_token['access_token']
 }
