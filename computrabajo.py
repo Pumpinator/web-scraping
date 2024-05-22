@@ -3,7 +3,6 @@ import sys
 import os
 import requests
 import re
-import time
 import csv
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

@@ -1,5 +1,4 @@
 import argparse
-import re
 import sys
 import os
 import requests
@@ -11,7 +10,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException
 from ms_graph import generate_access_token, GRAPH_API_ENDPOINT
 
