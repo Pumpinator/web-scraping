@@ -18,7 +18,7 @@ EMAIL = os.getenv('EMAIL')
 PASSWORD = os.getenv('PASSWORD')
 
 # Fuente: https://learndataanalysis.org/ms_graph-py-source-code/
-def generate_access_token():
+def generate_access_token(driver):
     # Save Session Token as a token file
     access_token_cache = msal.SerializableTokenCache()
 
@@ -45,8 +45,6 @@ def generate_access_token():
         user_code = flow['user_code']
         print(user_code)
 
-        chrome_options = webdriver.ChromeOptions()
-        driver = webdriver.Remote(command_executor=os.getenv('SELENIUM_GRAPH_HOST'), options=chrome_options)
         driver.get('https://microsoft.com/devicelogin')
 
         driver.find_element(By.XPATH, '/html/body/div/form/div/div/div[1]/div[3]/div/div/div/div[4]/div/input').send_keys(user_code)
@@ -68,8 +66,6 @@ def generate_access_token():
 
         token_response = client.acquire_token_by_device_flow(flow)
         
-        driver.quit()
-
     with open('ms_graph_api_token.json', 'w') as _f:
         _f.write(access_token_cache.serialize())
 

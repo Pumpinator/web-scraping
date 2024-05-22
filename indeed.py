@@ -28,7 +28,7 @@ keywords = args.keywords
 job_location = args.location
 
 chrome_options = webdriver.ChromeOptions()
-driver = webdriver.Remote(command_executor=os.getenv('SELENIUM_INDEED_HOST'), options=chrome_options)
+driver = webdriver.Remote(command_executor=os.getenv('SELENIUM_HOST'), options=chrome_options)
 
 url = 'https://mx.indeed.com'
 driver.get(url)
@@ -109,12 +109,13 @@ with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
         
         csv_writer.writerow([title, company, location, text, salary, publish_date, link])
     
-driver.quit()
         
-access_token = generate_access_token()
+access_token = generate_access_token(driver)
 headers = {
     'Authorization': 'Bearer ' + access_token['access_token']
 }
+
+driver.quit()
 
 with open(file_path, 'rb') as upload:
     media_file = upload.read()

@@ -89,12 +89,13 @@ with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
         
         csv_writer.writerow([title, company, location, text, publish_date, link])
                 
-driver.quit()
         
-access_token = generate_access_token()
+access_token = generate_access_token(driver)
 headers = {
     'Authorization': 'Bearer ' + access_token['access_token']
 }
+
+driver.quit()
 
 with open(file_path, 'rb') as upload:
     media_file = upload.read()

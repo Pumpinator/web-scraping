@@ -31,7 +31,7 @@ job_location = args.location
 chrome_options = webdriver.ChromeOptions()
 prefs = {"profile.default_content_setting_values.notifications" : 2}
 chrome_options.add_experimental_option("prefs",prefs)
-driver = webdriver.Remote(command_executor=os.getenv('SELENIUM_COMPUTRABAJO_HOST'), options=chrome_options)
+driver = webdriver.Remote(command_executor=os.getenv('SELENIUM_HOST'), options=chrome_options)
 
 url = 'https://mx.computrabajo.com'
 driver.get(url)
@@ -102,12 +102,12 @@ with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
         except NoSuchElementException:
             break
         
-driver.quit()
-        
-access_token = generate_access_token()
+access_token = generate_access_token(driver)
 headers = {
     'Authorization': 'Bearer ' + access_token['access_token']
 }
+
+driver.quit()
 
 with open(file_path, 'rb') as upload:
     media_file = upload.read()
