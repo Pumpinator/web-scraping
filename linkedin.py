@@ -9,6 +9,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from datetime import datetime
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from ms_graph import generate_access_token, GRAPH_API_ENDPOINT
@@ -22,7 +23,8 @@ keywords = args.keywords
 job_location = args.location
 
 options = webdriver.ChromeOptions()
-driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub', options=options)
+service = Service('/usr/bin/chromedriver')
+driver = webdriver.Remote(service=service, options=options)
 
 url = 'https://www.linkedin.com/jobs/search?trk=guest_homepage-basic_guest_nav_menu_jobs'
 driver.get(url)
@@ -85,8 +87,10 @@ with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
         print(title, company, location, text, publish_date, link)
         
         csv_writer.writerow([title, company, location, text, publish_date, link])
-
-access_token = generate_access_token(driver)
+                
+driver.quit()
+        
+access_token = generate_access_token(service)
 headers = {
     'Authorization': 'Bearer ' + access_token['access_token']
 }

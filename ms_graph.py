@@ -1,4 +1,5 @@
 from datetime import datetime
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -17,7 +18,7 @@ EMAIL = os.getenv('EMAIL')
 PASSWORD = os.getenv('PASSWORD')
 
 # Fuente: https://learndataanalysis.org/ms_graph-py-source-code/
-def generate_access_token(driver):
+def generate_access_token(service):
     # Save Session Token as a token file
     access_token_cache = msal.SerializableTokenCache()
 
@@ -44,6 +45,9 @@ def generate_access_token(driver):
         user_code = flow['user_code']
         print(user_code)
 
+
+        options = webdriver.ChromeOptions()
+        driver = webdriver.Remote(service=service, options=options)
         driver.get('https://microsoft.com/devicelogin')
 
         driver.find_element(By.XPATH, '/html/body/div/form/div/div/div[1]/div[3]/div/div/div/div[4]/div/input').send_keys(user_code)

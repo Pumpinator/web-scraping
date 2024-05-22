@@ -13,7 +13,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from ms_graph import generate_access_token, GRAPH_API_ENDPOINT
@@ -29,7 +28,8 @@ job_location = args.location
 chrome_options = webdriver.ChromeOptions()
 prefs = {"profile.default_content_setting_values.notifications" : 2}
 chrome_options.add_experimental_option("prefs",prefs)
-driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub', options=chrome_options)
+service = Service('/usr/bin/chromedriver')
+driver = webdriver.Remote(service=service, options=chrome_options)
 
 url = 'https://mx.computrabajo.com'
 driver.get(url)
@@ -100,7 +100,9 @@ with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
         except NoSuchElementException:
             break
         
-access_token = generate_access_token(driver)
+driver.quit()
+        
+access_token = generate_access_token(service)
 headers = {
     'Authorization': 'Bearer ' + access_token['access_token']
 }

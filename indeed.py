@@ -26,7 +26,8 @@ keywords = args.keywords
 job_location = args.location
 
 options = webdriver.ChromeOptions()
-driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub', options=options)
+service = Service('/usr/bin/chromedriver')
+driver = webdriver.Remote(service=service, options=options)
 
 url = 'https://mx.indeed.com'
 driver.get(url)
@@ -107,7 +108,9 @@ with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
         
         csv_writer.writerow([title, company, location, text, salary, publish_date, link])
     
-access_token = generate_access_token(driver)
+driver.quit()
+        
+access_token = generate_access_token(service)
 headers = {
     'Authorization': 'Bearer ' + access_token['access_token']
 }
