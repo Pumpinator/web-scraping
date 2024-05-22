@@ -31,8 +31,7 @@ job_location = args.location
 chrome_options = webdriver.ChromeOptions()
 prefs = {"profile.default_content_setting_values.notifications" : 2}
 chrome_options.add_experimental_option("prefs",prefs)
-service = Service(os.getenv('SERVICE_PATH'))
-driver = webdriver.Chrome(service=service, options=chrome_options)
+driver = webdriver.Remote(command_executor=os.getenv('SELENIUM_COMPUTRABAJO_HOST'), options=chrome_options)
 
 url = 'https://mx.computrabajo.com'
 driver.get(url)

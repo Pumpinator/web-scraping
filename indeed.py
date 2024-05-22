@@ -11,7 +11,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from selenium import webdriver
 from datetime import datetime
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
@@ -29,8 +28,7 @@ keywords = args.keywords
 job_location = args.location
 
 chrome_options = webdriver.ChromeOptions()
-service = Service(os.getenv('SERVICE_PATH'))
-driver = webdriver.Chrome(service=service, options=chrome_options)
+driver = webdriver.Remote(command_executor=os.getenv('SELENIUM_INDEED_HOST'), options=chrome_options)
 
 url = 'https://mx.indeed.com'
 driver.get(url)
