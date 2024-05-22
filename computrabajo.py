@@ -104,7 +104,7 @@ with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
         
 driver.quit()
         
-access_token = generate_access_token(service)
+access_token = generate_access_token()
 headers = {
     'Authorization': 'Bearer ' + access_token['access_token']
 }
