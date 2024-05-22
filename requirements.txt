@@ -1,8 +1,6 @@
-argparse
-csv
-datetime
-os
-requests
 selenium
-sys
-time
+python-dotenv
+argaparse
+datetime
+requests
+msal

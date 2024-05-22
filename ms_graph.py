@@ -47,9 +47,6 @@ def generate_access_token(service):
 
 
         chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
         driver = webdriver.Remote(service=service, options=chrome_options)
         driver.get('https://microsoft.com/devicelogin')
 

@@ -29,9 +29,6 @@ keywords = args.keywords
 job_location = args.location
 
 chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument('--headless')
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--disable-dev-shm-usage')
 service = Service(os.getenv('SERVICE_PATH'))
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
