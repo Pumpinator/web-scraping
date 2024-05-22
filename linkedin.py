@@ -25,7 +25,7 @@ keywords = args.keywords
 job_location = args.location
 
 chrome_options = webdriver.ChromeOptions()
-driver = webdriver.Remote(command_executor=os.getenv('SELENIUM_LINKEDIN_HOST'), options=chrome_options)
+driver = webdriver.Remote(command_executor=os.getenv('SELENIUM_HOST'), options=chrome_options)
 
 url = 'https://www.linkedin.com/jobs/search?trk=guest_homepage-basic_guest_nav_menu_jobs'
 driver.get(url)
