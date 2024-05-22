@@ -46,8 +46,11 @@ def generate_access_token(service):
         print(user_code)
 
 
-        options = webdriver.ChromeOptions()
-        driver = webdriver.Remote(service=service, options=options)
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        driver = webdriver.Remote(service=service, options=chrome_options)
         driver.get('https://microsoft.com/devicelogin')
 
         driver.find_element(By.XPATH, '/html/body/div/form/div/div/div[1]/div[3]/div/div/div/div[4]/div/input').send_keys(user_code)
