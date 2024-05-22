@@ -29,7 +29,7 @@ chrome_options = webdriver.ChromeOptions()
 prefs = {"profile.default_content_setting_values.notifications" : 2}
 chrome_options.add_experimental_option("prefs",prefs)
 service = Service('/usr/bin/chromedriver')
-driver = webdriver.Remote(service=service, options=chrome_options)
+driver = webdriver.Chrome(service=service, options=chrome_options)
 
 url = 'https://mx.computrabajo.com'
 driver.get(url)

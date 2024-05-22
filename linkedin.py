@@ -24,7 +24,7 @@ job_location = args.location
 
 options = webdriver.ChromeOptions()
 service = Service('/usr/bin/chromedriver')
-driver = webdriver.Remote(service=service, options=options)
+driver = webdriver.Chrome(service=service, options=options)
 
 url = 'https://www.linkedin.com/jobs/search?trk=guest_homepage-basic_guest_nav_menu_jobs'
 driver.get(url)
