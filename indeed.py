@@ -53,7 +53,7 @@ date_str = current_date.strftime("%y-%m-%d")
 file_name = f'{date_str}-{keywords}-{job_location}-Indeed.csv'
 file_path = f'Indeed/{file_name}'
 
-with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
+with open(f'data/{file_path}', 'w', newline = '', encoding ='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile)
     csv_writer.writerow(['title', 'company', 'location', 'text', 'salary', 'publish_date', 'link'])
     
@@ -117,7 +117,7 @@ headers = {
 
 driver.quit()
 
-with open(file_path, 'rb') as upload:
+with open(f'data/{file_path}', 'rb') as upload:
     media_file = upload.read()
 
 response = requests.put(
