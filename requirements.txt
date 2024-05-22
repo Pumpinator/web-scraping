@@ -1,6 +1,6 @@
-selenium==4.21.0
+selenium
 python-dotenv
-argaparse
+argparse
 datetime
 requests
 msal
