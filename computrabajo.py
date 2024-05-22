@@ -16,6 +16,9 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from ms_graph import generate_access_token, GRAPH_API_ENDPOINT
+from dotenv import load_dotenv
+
+load_dotenv()
 
 parser = argparse.ArgumentParser(description="Computrabajo job scraper")
 parser.add_argument('--keywords', type=str, default='Programador Java', required=False, help='Job keywords')
@@ -28,7 +31,7 @@ job_location = args.location
 chrome_options = webdriver.ChromeOptions()
 prefs = {"profile.default_content_setting_values.notifications" : 2}
 chrome_options.add_experimental_option("prefs",prefs)
-service = Service('/usr/bin/chromedriver')
+service = Service(os.getenv('SERVICE_PATH'))
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 url = 'https://mx.computrabajo.com'

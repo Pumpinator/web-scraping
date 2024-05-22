@@ -16,6 +16,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from ms_graph import generate_access_token, GRAPH_API_ENDPOINT
+from dotenv import load_dotenv
+
+load_dotenv()
 
 parser = argparse.ArgumentParser(description="Indeed job scraper")
 parser.add_argument('--keywords', type=str, default='Programador Java', required=False, help='Job keywords')
@@ -26,7 +29,7 @@ keywords = args.keywords
 job_location = args.location
 
 options = webdriver.ChromeOptions()
-service = Service('/usr/bin/chromedriver')
+service = Service(os.getenv('SERVICE_PATH'))
 driver = webdriver.Chrome(service=service, options=options)
 
 url = 'https://mx.indeed.com'
