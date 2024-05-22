@@ -50,7 +50,7 @@ driver.find_element(By.XPATH, '//*[@id="search-button"]').click()
 current_date = datetime.now()
 date_str = current_date.strftime("%y-%m-%d")
 file_name = f'{date_str}-{keywords}-{job_location}-Computrabajo.csv'
-file_path = f'./web-scraping/data/Computrabajo/{file_name}'
+file_path = f'Computrabajo/{file_name}'
 
 with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile)
@@ -110,7 +110,7 @@ with open(file_path, 'rb') as upload:
     media_file = upload.read()
 
 response = requests.put(
-    f'{GRAPH_API_ENDPOINT}/me/drive/items/root:/Scraping/Computrabajo/{file_name}:/content',
+    f'{GRAPH_API_ENDPOINT}/me/drive/items/root:/Scraping/{file_path}:/content',
     headers=headers,
     data=media_file,
 )

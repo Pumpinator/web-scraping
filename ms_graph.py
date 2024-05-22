@@ -16,8 +16,6 @@ APP_ID = os.getenv('APP_ID')
 SCOPES = ['Files.ReadWrite']
 EMAIL = os.getenv('EMAIL')
 PASSWORD = os.getenv('PASSWORD')
-FILE_TOKEN = 'ms_graph_api_token.json'
-FILE_PATH = f'./web-scraping/data{FILE_TOKEN}'
 
 # Fuente: https://learndataanalysis.org/ms_graph-py-source-code/
 def generate_access_token(driver):
@@ -25,13 +23,13 @@ def generate_access_token(driver):
     access_token_cache = msal.SerializableTokenCache()
 
     # read the token file
-    if os.path.exists(FILE_PATH):
-        access_token_cache.deserialize(open(FILE_PATH, "r").read())
-        token_detail = json.load(open(FILE_PATH,))
+    if os.path.exists('ms_graph_api_token.json'):
+        access_token_cache.deserialize(open("ms_graph_api_token.json", "r").read())
+        token_detail = json.load(open('ms_graph_api_token.json',))
         token_detail_key = list(token_detail['AccessToken'].keys())[0]
         token_expiration = datetime.fromtimestamp(int(token_detail['AccessToken'][token_detail_key]['expires_on']))
         if datetime.now() > token_expiration:
-            os.remove(FILE_PATH)
+            os.remove('ms_graph_api_token.json')
             access_token_cache = msal.SerializableTokenCache()
 
     # assign a SerializableTokenCache object to the client instance
@@ -70,7 +68,7 @@ def generate_access_token(driver):
         
         driver.quit()
 
-    with open(FILE_PATH, 'w') as _f:
+    with open('ms_graph_api_token.json', 'w') as _f:
         _f.write(access_token_cache.serialize())
 
     return token_response

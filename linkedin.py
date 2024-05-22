@@ -53,7 +53,7 @@ jobs = driver.find_elements(By.XPATH, '//*[@id="main-content"]/section[2]/ul/li'
 current_date = datetime.now()
 date_str = current_date.strftime("%y-%m-%d")
 file_name = f'{date_str}-{keywords}-{job_location}-LinkedIn.csv'
-file_path = f'./web-scraping/data/LinkedIn{file_name}'
+file_path = f'LinkedIn/{file_name}'
 
 with open(file_path, 'w', newline = '', encoding ='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile)
@@ -97,7 +97,7 @@ with open(file_path, 'rb') as upload:
     media_file = upload.read()
 
 response = requests.put(
-    f'{GRAPH_API_ENDPOINT}/me/drive/items/root:/Scraping/LinkedIn/{file_name}:/content',
+    f'{GRAPH_API_ENDPOINT}/me/drive/items/root:/Scraping/{file_path}:/content',
     headers=headers,
     data=media_file,
 )
